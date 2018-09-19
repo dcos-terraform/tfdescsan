@@ -184,8 +184,9 @@ class TFVarDesc:
         elif 'output' in hcl_data:
             var_key = 'output'
         else:
-            self._log.fatal('Found neither "variable" nor "output" in hcl file')
-            sys.exit(3)
+            error_msg = 'Found neither "variable" nor "output" in hcl file'
+            self._log.fatal(error_msg)
+            raise RuntimeError(error_msg)
 
         for variable, data in hcl_data[var_key].items():
 
