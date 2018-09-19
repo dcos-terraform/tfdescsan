@@ -179,7 +179,15 @@ class TFVarDesc:
         :return: True or False
         """
         hcl_data = hcl.load(self.variables_io)
-        for variable, data in hcl_data['variable'].items():
+        if 'variable' in hcl_data:
+            var_key = 'variable'
+        elif 'output' in hcl_data:
+            var_key = 'output'
+        else:
+            self._log.fatal('Found neither "variable" nor "output" in hcl file')
+            sys.exit(3)
+
+        for variable, data in hcl_data[var_key].items():
 
             description = None
             if variable in self.vardesc:
@@ -234,7 +242,7 @@ class TFVarDesc:
         update_next_description = False
         current_variable = None
         current_variables = self.variables_io.readlines()
-        p = re.compile(r'variable\s+"(?P<variable>.*?)"')  # todo: can variables be defined in single quotes?
+        p = re.compile(r'(variable|output)\s+"(?P<variable>.*?)"')  # todo: can variables be defined in single quotes?
         idx = 0
         close = False
         while idx < len(current_variables):  # we're using manual iteration because we might want to skip some lines
