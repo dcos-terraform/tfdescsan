@@ -108,12 +108,24 @@ class TFVarDesc:
     def __fill_vardesc(self):
         """Read the tsv file into memory
         """
-        self._log.debug('Loading {} into memory'.format(self._tsv_path))
-        with open(self._tsv_path, 'r') as tsvin:
-            tsvin = csv.reader(tsvin, delimiter='\t')
-            self.__vardesc = {
-            r[0]: {'desc': r[1], 'gcp': self.__safe_list_get(r, 3, ''), 'aws': self.__safe_list_get(r, 2, ''),
-                   'azure': self.__safe_list_get(r, 4, '')} for r in tsvin if r[1].lower() != 'description'}
+        if self._tsv_path.startswith('http://') or self._tsv_path.startswith('https://'):
+            self._log.debug('Loading {} from network into memory'.format(self._tsv_path))
+            try:
+                import requests
+            except ImportError:
+                error_msg = 'Error: Python requests module missing! Try installing via: $ pip install requests'
+                self._log.fatal(error_msg)
+                raise RuntimeError(error_msg)
+            tsv_data = requests.get(self._tsv_path).text
+            tsv_in = io.StringIO(tsv_data)
+        else:
+            self._log.debug('Loading {} from disk into memory'.format(self._tsv_path))
+            tsv_in = open(self._tsv_path, 'r')
+        tsv = csv.reader(tsv_in, delimiter='\t')
+        self.__vardesc = {
+        r[0]: {'desc': r[1], 'gcp': self.__safe_list_get(r, 3, ''), 'aws': self.__safe_list_get(r, 2, ''),
+               'azure': self.__safe_list_get(r, 4, '')} for r in tsv if r[1].lower() != 'description'}
+        tsv_in.close()
 
     @property
     def vardesc(self):
