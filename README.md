@@ -14,20 +14,21 @@ The format of the variable description mapping table is
 ## Usage
 ```
 usage: tfdescsan.py [-h] --tsv TSV_PATH --var VAR_PATH
-                    [--out OUT_PATH | --inplace] --cloud {aws,gcp,azure}
-                    [--verbose]
+                    [--out OUT_PATH | --inplace | --test]
+                    [--cloud {aws,gcp,azure}] [--verbose]
 
 Parse terraform variables.tf and update variable descriptions
 
 optional arguments:
   -h, --help            show this help message and exit
-  --tsv TSV_PATH, -t TSV_PATH
+  --tsv TSV_PATH, -m TSV_PATH
                         TSV description mapping file
   --var VAR_PATH, -f VAR_PATH
                         Terraform variables.tf file
   --out OUT_PATH, -o OUT_PATH
                         Output variables.tf file
   --inplace, -i         Replace variables.tf in place
+  --test, -t            Test only - exit > 0 on errors or warnings
   --cloud {aws,gcp,azure}, -c {aws,gcp,azure}
                         Name of Cloud
   --verbose, -v         Verbose logging

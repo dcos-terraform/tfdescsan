@@ -17,12 +17,14 @@ except ImportError:
 
 def main(argv):
     p = argparse.ArgumentParser(description='Parse terraform variables.tf and update variable descriptions')
-    p.add_argument('--tsv', '-t', help='TSV description mapping file', dest='tsv_path', required=True)
+    p.add_argument('--tsv', '-m', help='TSV description mapping file', dest='tsv_path', required=True)
     p.add_argument('--var', '-f', help='Terraform variables.tf file', dest='var_path', required=True)
     pg = p.add_mutually_exclusive_group()
     pg.add_argument('--out', '-o', help='Output variables.tf file', dest='out_path', type=str)
     pg.add_argument('--inplace', '-i', help='Replace variables.tf in place', dest='inplace', action='store_true',
                     default=False)
+    pg.add_argument('--test', '-t', help='Test only - exit > 0 on errors or warnings', dest='test',
+                    action='store_true', default=False)
     p.add_argument('--cloud', '-c', help='Name of Cloud', dest='cloud', choices=['aws', 'gcp', 'azure'])
     p.add_argument('--verbose', '-v', help='Verbose logging', dest='verbose', action='store_true', default=False)
     args = p.parse_args(argv)
@@ -45,7 +47,11 @@ def main(argv):
     missing = Missing()
     tfd.register_mapping_missing_callback(missing.callback)
 
-    if args.out_path or args.inplace:
+    if args.test:
+        # if anything was changed or there were missing mappings
+        if tfd.variables != tfd.updated_variables or len(missing.data) > 0:
+            sys.exit(1)
+    elif args.out_path or args.inplace:
         # write the updated variables to either a new file or replace in-place
         # if the later we add a flag that tells the method to only replace
         # if content has changed
