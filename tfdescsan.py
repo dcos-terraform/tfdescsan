@@ -305,7 +305,16 @@ class TFVarDesc:
                 update_next_description = False
                 current_variable = None
             updated_variables.append(line)
-        self.__updated_variables = ''.join(updated_variables)
+
+        updated_variables = ''.join(updated_variables)
+        try:
+            # try to load the generated config using the official
+            # hcl lib to make sure we didn't break anything
+            hcl.load(io.StringIO(updated_variables))
+        except ValueError:
+            self._log.fatal('Generated HCL is invalid - aborting')
+            raise
+        self.__updated_variables = updated_variables
 
     def __on_mapping_missing(self, variable):
         """Event handler that's being called whenever a variable
