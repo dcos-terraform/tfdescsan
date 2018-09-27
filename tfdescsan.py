@@ -129,7 +129,8 @@ class TFVarDesc:
             self._log.debug('Loading {} from disk into memory'.format(self._tsv_path))
             tsv_in = open(self._tsv_path, 'r')
         tsv = csv.reader(tsv_in, delimiter='\t')
-        self.__vardesc = {r[0]: {v: self.__safe_list_get(r, i, '') for i, v in enumerate(self.__tsv_format)}
+        self.__vardesc = {r[0]: {v: self.__safe_list_get(r, i, '').replace('"', "'")
+                                 for i, v in enumerate(self.__tsv_format)}
                           for r in tsv if r[1].lower() != 'description'}
         tsv_in.close()
 
