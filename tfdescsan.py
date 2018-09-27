@@ -25,7 +25,7 @@ def main(argv):
                     default=False)
     pg.add_argument('--test', '-t', help='Test only - exit > 0 on errors or warnings', dest='test',
                     action='store_true', default=False)
-    p.add_argument('--cloud', '-c', help='Name of Cloud', dest='cloud', choices=['aws', 'gcp', 'azure'])
+    p.add_argument('--cloud', '-c', help='Name of Cloud', dest='cloud')
     p.add_argument('--verbose', '-v', help='Verbose logging', dest='verbose', action='store_true', default=False)
     args = p.parse_args(argv)
 
@@ -101,6 +101,7 @@ class TFVarDesc:
         self.__mapping_missing_callbacks = []
         self.__variables = None
         self.__updated_variables = None
+        self.__tsv_format = ['variable', 'desc', 'aws', 'gcp', 'azure']
 
     def __repr__(self):
         return self.updated_variables
@@ -128,9 +129,8 @@ class TFVarDesc:
             self._log.debug('Loading {} from disk into memory'.format(self._tsv_path))
             tsv_in = open(self._tsv_path, 'r')
         tsv = csv.reader(tsv_in, delimiter='\t')
-        self.__vardesc = {
-        r[0]: {'desc': r[1], 'gcp': self.__safe_list_get(r, 3, ''), 'aws': self.__safe_list_get(r, 2, ''),
-               'azure': self.__safe_list_get(r, 4, '')} for r in tsv if r[1].lower() != 'description'}
+        self.__vardesc = {r[0]: {v: self.__safe_list_get(r, i, '') for i, v in enumerate(self.__tsv_format)}
+                          for r in tsv if r[1].lower() != 'description'}
         tsv_in.close()
 
     @property
