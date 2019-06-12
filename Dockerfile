@@ -6,4 +6,4 @@ RUN apk add --no-cache ca-certificates openjdk8-jre git \
     && chmod +x tfdescsan.py \
     && mv tfdescsan.py /usr/bin/tfdescsan
 WORKDIR /root
-ENTRYPOINT ["/usr/bin/tfdescsan" ]
+ENTRYPOINT ["/usr/bin/tfdescsan"]

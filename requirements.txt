@@ -1,2 +1,2 @@
-pyhcl
+git+https://github.com/virtuald/pyhcl.git@0.3.12#egg=pyhcl
 requests
